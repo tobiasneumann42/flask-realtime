@@ -109,7 +109,7 @@ def create_spaces(sid: str, running: Callable[[], bool], user_id: str, clean_up:
     # add a log.handler to stdout; log.output will be sent to the client via websocket
     format = logging.Formatter(fmt='{levelname:8s} create_spaces: {message}', style='{')
     handler = logging.StreamHandler(stream=sys.stdout)
-    handler.setLevel(logging.DEBUG)
+    handler.setLevel(logging.ERROR)
     handler.setFormatter(format)
     log.addHandler(handler)
 

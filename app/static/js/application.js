@@ -10,6 +10,11 @@ $(document).ready(function(){
         e.scrollTop(log.scrollHeight);
     });
 
+    $('button#start-get-uuids').on('click', function(event){
+        $('#log').empty();
+        socket.emit('start_get_uuids');
+    });
+
     $('button#start-space-stats').on('click', function(event){
         $('#log').empty();
         socket.emit('start_space_stats');

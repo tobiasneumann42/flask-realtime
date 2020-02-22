@@ -16,7 +16,7 @@ from redis import Redis
 
 from app.interactive import Token
 
-#logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.ERROR)
 
 # this guys is a little "chatty" at level INFO
 logging.getLogger('engineio.server').setLevel(logging.WARNING)

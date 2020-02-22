@@ -11,6 +11,7 @@ from . import socketio
 from .flaskthread import FlaskThread
 from .list_spaces import list_spaces
 from .create_spaces import create_spaces
+from .get_uuids import get_uuids
 
 log = logging.getLogger(__name__)
 
@@ -18,6 +19,23 @@ log = logging.getLogger(__name__)
 @socketio.on('connect')
 def connect():
     log.debug(f'connect for session {request.sid}')
+
+@socketio.on('start_get_uuids')
+def start_get_uuids() -> None:
+    """
+    Start button has been pressed
+    :return: None
+    """
+    log.debug(f'start_get_uuids {request.sid}')
+    thread = FlaskThread.get(request.sid)
+    if thread is None:
+        # create FlaskThread; pass user id as additional parameter to list_paces()
+        thread = FlaskThread.for_session(sid=request.sid, target=get_uuids, name=f'task-{request.sid}',
+                                         user_id=session['user_id'])
+        log.debug(f'start_get_uuids, starting thread for {request.sid}')
+        thread.start()
+    else:
+        log.warning(f'start_get_uuids, thread already running for {request.sid}')
 
 
 @socketio.on('start_space_stats')
