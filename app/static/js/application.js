@@ -30,6 +30,10 @@ $(document).ready(function(){
         socket.emit('start_delete_spaces');
     });
 
+     $('button#start-webex-proc').on('click', function(event){
+        $('#log').empty();
+        socket.emit('start_webex_proc');
+    });
 
     $('button#stop').on('click', function(event){
         socket.emit('stop_request');

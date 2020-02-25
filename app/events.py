@@ -12,6 +12,7 @@ from .flaskthread import FlaskThread
 from .list_spaces import list_spaces
 from .create_spaces import create_spaces
 from .get_uuids import get_uuids
+from .webex_proc import webex_proc
 
 log = logging.getLogger(__name__)
 
@@ -89,6 +90,24 @@ def start_delete_spaces() -> None:
         thread.start()
     else:
         log.warning(f'start_delete_spaces, thread already running for {request.sid}')
+
+
+@socketio.on('start_webex_proc')
+def start_space_stats() -> None:
+    """
+    Start button has been pressed
+    :return: None
+    """
+    log.debug(f'start_webex_proc {request.sid}')
+    thread = FlaskThread.get(request.sid)
+    if thread is None:
+        # create FlaskThread; pass user id as additional parameter to list_paces()
+        thread = FlaskThread.for_session(sid=request.sid, target=webex_proc, name=f'task-{request.sid}',
+                                         user_id=session['user_id'])
+        log.debug(f'start_webex_proc, starting thread for {request.sid}')
+        thread.start()
+    else:
+        log.warning(f'start_webex_proc, thread already running for {request.sid}')
 
 
 def stop_thread() -> None:
