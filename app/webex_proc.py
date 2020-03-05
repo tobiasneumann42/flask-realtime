@@ -156,7 +156,7 @@ async def as_webex_proc(access_token: str, running: Callable[[], bool]):
         # run this every 10 sec
         time.sleep(10)
         jResponse = get_KMS_requests()
-        print(f'Total number of records in search {jResponse.hits.total}')
+        print(f"Total number of records in search {jResponse['hits'].['total']}")
         records_updated = 0
         count = 0
         for userid in jResponse["hits"]["hits"]:
@@ -165,15 +165,15 @@ async def as_webex_proc(access_token: str, running: Callable[[], bool]):
               # more housekeeping for empty records
               if userid["_source"]["userId"] == 'null': continue
               if userid["_source"]["userId"]:
-                print(f'Checking userinfo already in elastic for user {userid._source.uderId}')
+                print(f"Checking userinfo already in elastic for user {userid.['_source'].['uderId']}")
                 uinfo = get_user_info_elastic( userid["_source"]["userId"] )
                 if not uinfo:
-                  print(f'No entry in elastic: {userid._source.userId}')
+                  print(f"No entry in elastic: {userid.['_source'].['userId']}")
                   uinfo = get_user_info_webex( userid["_source"]["userId"], access_token )
-                  print(f'Fetched entry from webex cloud: %s ', uinfo )
+                  print(f"Fetched entry from webex cloud: %s ", uinfo )
                 # execute update
                 if uinfo:
-                  log.info(f'execute update: {userid["_index"]} - {userid["_id"]}')
+                  print(f"execute update: {userid['_index']} - {userid['_id']}")
                   update_userinfo( userid, uinfo )
                   records_updated  += 1
                   count += 1
