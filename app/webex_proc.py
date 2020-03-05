@@ -112,7 +112,7 @@ def get_user_info_elastic(useruuid):
 		# get userinfo 
 		if 'userinfo' in jResp['hits']['hits'][0]['_source']:
 			resp['userinfo'] = jResp['hits']['hits'][0]['_source']['userinfo']
-			print("Returned userinfo object get_user_elastic: ", resp)
+			log.debug(f'Returned userinfo object get_user_elastic: {resp}')
 			return resp
 	else:
 		return False
