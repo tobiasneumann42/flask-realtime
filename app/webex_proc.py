@@ -156,9 +156,7 @@ async def as_webex_proc(access_token: str, running: Callable[[], bool]):
         # run this every 10 sec
         time.sleep(10)
         jResponse = get_KMS_requests()
-
-		print(f'Total number of records in search {jResponse.hits.total}')
-
+        print(f'Total number of records in search {jResponse.hits.total}')
         records_updated = 0
         count = 0
         for userid in jResponse["hits"]["hits"]:
