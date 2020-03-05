@@ -165,7 +165,7 @@ async def as_webex_proc(access_token: str, running: Callable[[], bool]):
             # check for broken records with no userID field
             if 'userId' in userid["_source"]:
               # more housekeeping for empty records
-			  if userid["_source"]["userId"] == 'null': continue
+              if userid["_source"]["userId"] == 'null': continue
               if userid["_source"]["userId"]:
                 log.info(f'Checking userinfo already in elastic: {userid["_source"]["userId"]}')
                 uinfo = get_user_info_elastic( userid["_source"]["userId"] )
