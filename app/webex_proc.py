@@ -65,7 +65,7 @@ def get_KMS_requests():
                             },
                             "must_not": [
                                 {"exists": {"field": "userinfo.created"}},
-                                {"match":{"hdsuserID":"null"}}
+                                {"match":{"userId":"null"}}
                                 ]
                             }
                         }
@@ -158,7 +158,6 @@ async def as_webex_proc(access_token: str, running: Callable[[], bool]):
         time.sleep(10)
         jResponse = get_KMS_requests()
         print(f"### Total number of records in search {jResponse['hits']['total']}")
-        print(f"Number of records in need for update {jResponse['hits']['hits']}")
         records_updated = 0
 
         for userid in jResponse['hits']['hits']:
