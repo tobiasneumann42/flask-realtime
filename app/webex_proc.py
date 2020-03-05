@@ -77,7 +77,6 @@ def get_KMS_requests():
 				auth=HTTPBasicAuth('elastic', 'C1sco12345'),
 				headers={'Content-type': 'application/json', 'Accept': 'text/plain'},
 				verify="/home/flaskdemo/app/ad1_ca.cer")
-	print("KMS requests ", response.status_code)
 	log.debug(f' get_KMS_requests response {response}')
 	jResp = json.loads(response.content.decode('utf-8'))
 	return jResp 
@@ -90,25 +89,25 @@ def get_user_info_elastic(useruuid):
 				headers={ 'Content-Type': 'application/json' },
 				data=json.dumps({
     					'_source': ['userinfo'],
-					'from' : 0, 'size' : 1,
-					'query': {
-				   		'bool': {
-				      			'must': [
-					 			{ 'match': { 'userId': {
-										'query': useruuid
-							    			}
-									}
-								},
-								{ 'exists': { 'field': 'userinfo' }
-								}
-				      			]
+						'from' : 0, 'size' : 1,
+						'query': {
+				   			'bool': {
+				      				'must': [
+										{
+											'match': {
+												'userId': {	'query': useruuid }
+											}
+										},
+										{
+											'exists': { 'field': 'userinfo' }
+										}
+				      				]
 				    		}
-					}
+						}
 				}) )
 	jResp = json.loads(response.content.decode('utf-8'))
 	resp = {}
-	print( "Result REST get_user_elastic: ", jResp )
-        # check if uuid already in elastic - number of hits returnes > 0
+	# check if uuid already in elastic - number of hits returnes > 0
 	if jResp['hits']['total']['value'] > 0:
 		# get userinfo 
 		if 'userinfo' in jResp['hits']['hits'][0]['_source']:
@@ -121,7 +120,6 @@ def get_user_info_elastic(useruuid):
 def get_user_info_webex(useruuid, authtoken):
 	url = 'https://api.ciscospark.com/v1/people/'+useruuid
 	auth = 'Bearer ' + authtoken
-	# print( "DEBUG: Webex Teams API lookup URL & access token: ", url, auth )
 	logging.debug('Webex API lookup URL & access token: %s %s ', url, auth )
 	response = requests.get ( url, headers={
 					'Content-Type': 'application/json',
@@ -131,19 +129,15 @@ def get_user_info_webex(useruuid, authtoken):
 		jResp = json.loads(response.content.decode('utf-8'))
 		resp = {}
 		resp['userinfo'] = jResp
-		# print( "DEBUG: Result 200 OK REST get_user_info_webex: ", resp['userinfo'] )
 		logging.debug('Result 200 OK REST get_user_info_webex : %s ', resp['userinfo'] )
 	else:
 		print( "DEBUG: Result REST get_user_info_webex (raw) something went wrong: ", response )
 		input("Press Enter to Continue...")
-
 	return resp
 
 def update_userinfo(userinfo, new_uinfo):
 	url = 'https://elk.dcloud.cisco.com:9200/' + userinfo['_index'] + '/_doc/' + userinfo['_id']+ '/_update'
-	# print( "DEBUG: update_userinfo URL: ", url )
-	# print( "DEBUG: update_userinfo new user information: ", new_uinfo['userinfo'] )
-	log.debug('updare_userinfo new user information: %s ', new_uinfo['userinfo'] )
+	log.info(f"updare_userinfo new user information: {new_uinfo['userinfo']['email']}")
 	reponse = requests.post( url,
 							 auth=HTTPBasicAuth('elastic', 'C1sco12345'),
 							 verify="/home/flaskdemo/app/ad1_ca.cer",
@@ -153,8 +147,7 @@ def update_userinfo(userinfo, new_uinfo):
 				} ) )
 	jResp = json.loads(reponse.content.decode('utf-8'))
 	resp = {}
-	# print( "update_userinfo URL REST reponse: ", jResp )
-	log.debug('update_userinfo URL REST response: %s ', jResp )
+	log.info(f'update_userinfo URL REST response: %s ', jResp )
 	return
 
 async def as_webex_proc(access_token: str, running: Callable[[], bool]):
@@ -164,34 +157,31 @@ async def as_webex_proc(access_token: str, running: Callable[[], bool]):
         time.sleep(10)
         jResponse = get_KMS_requests()
 
-        log.debug('Total number of hits in search: %s ',  jResponse['hits']['total'])
+        log.info(f'Total number of records in search: {jResponse['hits']['total']}')
 
         records_updated = 0
         count = 0
         for userid in jResponse["hits"]["hits"]:
-            log.debug('search result: %s ', userid)
             # check for broken records with no userID field
             if 'userId' in userid["_source"]:
               # more housekeeping for empty records
-              if userid["_source"]["userId"] == 'null': continue
               if userid["_source"]["userId"]:
-                log.debug('checking userinfo already in elastic: %s ', userid["_source"]["userId"] )
+                log.info(f'Checking userinfo already in elastic: {userid["_source"]["userId"]}' )
                 uinfo = get_user_info_elastic( userid["_source"]["userId"] )
                 if not uinfo:
-                  # print( "DEBUG: No entry in elastic: ", userid["_source"]["userId"] )
-                  log.debug('No entry in elastic: %s ', userid["_source"]["userId"] )
+                  log.info(f'No entry in elastic: {userid["_source"]["userId"]}' )
                   uinfo = get_user_info_webex( userid["_source"]["userId"], access_token )
-                  # print( "DEBUG: Fetched entry from webex cloud: ", uinfo )
-                  log.debug('Fetched entry from webex cloud: %s ', uinfo )
-                  # print( "DEBUG: execute main loop update: ", userid["_index"], userid["_id"])
-                  log.debug('execute main loop update: %s - %s', userid["_index"], userid["_id"])
+                  log.info(f'Fetched entry from webex cloud: %s ', uinfo )
+                # execute update
+                if uinfo:
+                  log.info(f'execute update: {userid["_index"]} - {userid["_id"]}')
                   update_userinfo( userid, uinfo )
                   records_updated  += 1
                   count += 1
         
         # print( "DEBUG: records updated: ", records_updated )
-        log.debug('records updated: %s ', records_updated )
-        log.debug('count: %s ', count) 
+        log.info(f'records updated: {records_updated}')
+        log.info(f'count: {count}')
     
     return
 
