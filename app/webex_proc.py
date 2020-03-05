@@ -131,7 +131,7 @@ def get_user_info_webex(useruuid, authtoken):
 		resp['userinfo'] = jResp
 		logging.debug('Result 200 OK REST get_user_info_webex : %s ', resp['userinfo'] )
 	else:
-		print( "DEBUG: Result REST get_user_info_webex (raw) something went wrong: ", response )
+		print("DEBUG: Result REST get_user_info_webex (raw) something went wrong: ", response )
 		input("Press Enter to Continue...")
 	return resp
 
@@ -165,11 +165,12 @@ async def as_webex_proc(access_token: str, running: Callable[[], bool]):
             # check for broken records with no userID field
             if 'userId' in userid["_source"]:
               # more housekeeping for empty records
+			  if userid["_source"]["userId"] == 'null': continue
               if userid["_source"]["userId"]:
-                log.info(f'Checking userinfo already in elastic: {userid["_source"]["userId"]}' )
+                log.info(f'Checking userinfo already in elastic: {userid["_source"]["userId"]}')
                 uinfo = get_user_info_elastic( userid["_source"]["userId"] )
                 if not uinfo:
-                  log.info(f'No entry in elastic: {userid["_source"]["userId"]}' )
+                  log.info(f'No entry in elastic: {userid["_source"]["userId"]}')
                   uinfo = get_user_info_webex( userid["_source"]["userId"], access_token )
                   log.info(f'Fetched entry from webex cloud: %s ', uinfo )
                 # execute update
