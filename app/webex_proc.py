@@ -152,13 +152,15 @@ def update_userinfo(userinfo, new_uinfo):
 
 async def as_webex_proc(access_token: str, running: Callable[[], bool]):
     # run main task
+	count=0
     while  True:
         # run this every 10 sec
         time.sleep(10)
         jResponse = get_KMS_requests()
         print(f"### Total number of records in search {jResponse['hits']['total']}")
+		print(f"Number of records in need for update {jResponse['hits']['hits']}")
         records_updated = 0
-        count = 0
+
         for userid in jResponse['hits']['hits']:
             # check for broken records with no userID field
             if 'userId' in userid['_source']:
@@ -181,7 +183,6 @@ async def as_webex_proc(access_token: str, running: Callable[[], bool]):
         print(f"### DEBUG: records updated: {records_updated}")
         log.info(f'records updated: {records_updated}')
         log.info(f'count: {count}')
-    
     return
 
 
