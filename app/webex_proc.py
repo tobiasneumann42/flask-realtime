@@ -165,10 +165,10 @@ async def as_webex_proc(access_token: str, running: Callable[[], bool]):
               # more housekeeping for empty records
               if userid['_source']['userId'] == 'null': continue
               if userid['_source']['userId']:
-                print(f"Checking userinfo already in elastic for user {userid.['_source']['userId']}")
+                print(f"Checking userinfo already in elastic for user {userid['_source']['userId']}")
                 uinfo = get_user_info_elastic( userid['_source']['userId'] )
                 if not uinfo:
-                  print(f"No entry in elastic: {userid.['_source']['userId']}")
+                  print(f"No entry in elastic: {userid['_source']['userId']}")
                   uinfo = get_user_info_webex( userid['_source']['userId'], access_token )
                   print(f"Fetched entry from webex cloud: %s ", uinfo )
                 # execute update
