@@ -156,20 +156,20 @@ async def as_webex_proc(access_token: str, running: Callable[[], bool]):
         # run this every 10 sec
         time.sleep(10)
         jResponse = get_KMS_requests()
-        print(f"Total number of records in search {jResponse['hits'].['total']}")
+        print(f"Total number of records in search {jResponse['hits']['total']}")
         records_updated = 0
         count = 0
-        for userid in jResponse["hits"]["hits"]:
+        for userid in jResponse['hits']['hits']:
             # check for broken records with no userID field
-            if 'userId' in userid["_source"]:
+            if 'userId' in userid['_source']:
               # more housekeeping for empty records
-              if userid["_source"]["userId"] == 'null': continue
-              if userid["_source"]["userId"]:
-                print(f"Checking userinfo already in elastic for user {userid.['_source'].['userId']}")
-                uinfo = get_user_info_elastic( userid["_source"]["userId"] )
+              if userid['_source']['userId'] == 'null': continue
+              if userid['_source']['userId']:
+                print(f"Checking userinfo already in elastic for user {userid.['_source']['userId']}")
+                uinfo = get_user_info_elastic( userid['_source']['userId'] )
                 if not uinfo:
-                  print(f"No entry in elastic: {userid.['_source'].['userId']}")
-                  uinfo = get_user_info_webex( userid["_source"]["userId"], access_token )
+                  print(f"No entry in elastic: {userid.['_source']['userId']}")
+                  uinfo = get_user_info_webex( userid['_source']['userId'], access_token )
                   print(f"Fetched entry from webex cloud: %s ", uinfo )
                 # execute update
                 if uinfo:

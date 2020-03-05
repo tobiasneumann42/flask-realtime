@@ -96,6 +96,7 @@ async def as_create_spaces(access_token: str, running: Callable[[], bool], clean
         random.shuffle(people)
         title = f'{SPACE_PREFIX} {str(uuid.uuid4())}'
         log.info('Creating space: {}'.format(title))
+        print("Creating space: {}".format(title))
         r = await api.create_space(p_title=title)
         space_id = r.id
 
