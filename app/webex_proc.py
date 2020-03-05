@@ -137,7 +137,7 @@ def get_user_info_webex(useruuid, authtoken):
 
 def update_userinfo(userinfo, new_uinfo):
 	url = 'https://elk.dcloud.cisco.com:9200/' + userinfo['_index'] + '/_doc/' + userinfo['_id']+ '/_update'
-	log.info(f"updare_userinfo new user information: {new_uinfo['userinfo']['email']}")
+	log.info(f"updare_userinfo new user information: {new_uinfo['userinfo']['emails']}")
 	reponse = requests.post( url,
 							 auth=HTTPBasicAuth('elastic', 'C1sco12345'),
 							 verify="/home/flaskdemo/app/ad1_ca.cer",
